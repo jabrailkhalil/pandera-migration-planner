@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pandera-migration-planner"
+version = "0.1.0"
+description = "Explicit, validated pandas column renames and numeric casts with Pandera"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "jabrailkhalil"}]
+dependencies = ["pandera[pandas]>=0.24,<0.36"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.12", "mypy>=1.19", "build>=1.2"]
+
+[project.urls]
+Repository = "https://github.com/jabrailkhalil/pandera-migration-planner"
+
+[tool.ruff]
+line-length = 79
+target-version = "py310"
+extend-exclude = [".venv*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

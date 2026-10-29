@@ -1,0 +1,48 @@
+name: tests
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m mypy src
+      - run: python -m pytest -q
+      - run: python examples/rename_and_cast.py
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install build
+      - run: python -m build
+      - run: python -m venv /tmp/wheel-test
+      - run: /tmp/wheel-test/bin/python -m pip install dist/*.whl
+      - run: /tmp/wheel-test/bin/python examples/rename_and_cast.py
+  minimum-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: >-
+          python -m pip install -e '.[dev]'
+          'pandera==0.24.0' 'pandas==2.1.1' 'numpy==1.26.4'
+      - run: python -m pytest -q
+      - run: python examples/rename_and_cast.py
